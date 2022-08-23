@@ -10,5 +10,6 @@ namespace airtel.Model
         public int packId { get; set; }
         public string packName { get; set; }
         public int price { get; set; }
+        public bool? purchased { get; set; }
     }
 }

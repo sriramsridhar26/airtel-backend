@@ -25,7 +25,7 @@ namespace airtel.Controllers
             else
             {
                 IEnumerable<User> userc = _context.user
-                                    .Where(x => x.customerId == users.customerId);
+                                                  .Where(x => x.customerId == users.customerId);
                 if (userc == null)
                 {
                     return BadRequest("User Not Found");
@@ -88,19 +88,15 @@ namespace airtel.Controllers
                     customerId = addtocart.customerId,
                     packId = addtocart.packId,
                     packName = tempPack.PackName,
-                    price = tempPack.cost
+                    price = tempPack.cost,
+                    purchased = false
+            
                 };
 
                 _context.orders.Add(t);
 
                 _context.SaveChanges();
                 string str = "success";
-                //var resp = new HttpResponseMessage(HttpStatusCode.OK)
-                //{
-                //    Content = new StringContent(str, System.Text.Encoding.UTF8, "text/plain")
-                //};
-
-                //return resp;
                 
                 return Ok(Json("success"));
             }
@@ -109,7 +105,76 @@ namespace airtel.Controllers
                 return BadRequest();
             }
         }
+        [HttpGet("/Getallcart")]
+        public async Task<IActionResult> Getallcart([FromQuery] long customerId)
+        {
+            if (customerId != null)
+            {
+                return Ok( _context.orders.Where(x => x.customerId == customerId));
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
+        [HttpDelete("/Deletecartitem")]
+        public async Task<IActionResult> Deletecartitem([FromQuery] int orderid)
+        {
+            if(orderid != null)
+            {
+                var items = _context.orders.Where(x => x.orderId == orderid).FirstOrDefault();
+                if (items !=  null)
+                {
+                    var t= _context.orders.Remove(items);
+                    _context.SaveChangesAsync();
+                    return Ok(Json("success"));
+                }
+                else
+                {
+                    return BadRequest("Item not present in cart");
+                }
+                
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("/Getcustname")]
+        public async Task<IActionResult> Getcustname([FromQuery] long customerId)
+        {
+            if (customerId != null)
+            {
+                IEnumerable<User> userc = _context.user
+                                                  .Where(x => x.customerId == customerId);
+                return Ok(userc.Select(x => x.customerName));
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("/PlaceOrder")]
+        public async Task<IActionResult> PlaceOrder([FromQuery] long customerId)
+        {
+            if (customerId != null)
+            {
+                using (_context)
+                {
+                    var temp = _context.orders.Where(x => x.customerId == customerId).ToList();
+                    temp.ForEach(a => a.purchased = true);
+                    _context.SaveChanges();
+
+                }
+                
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 
 }
