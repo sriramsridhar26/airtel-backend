@@ -45,6 +45,21 @@ namespace airtel.Controllers
 
         }
 
+        [HttpGet("/Getcustname")]
+        public async Task<IActionResult> Getcustname([FromQuery] long customerId)
+        {
+            if (customerId != null)
+            {
+                IEnumerable<User> userc = _context.user
+                                                  .Where(x => x.customerId == customerId);
+                return Ok(userc.Select(x => x.customerName));
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
         [HttpGet("/Plans")]
         public async Task<IActionResult> GetPlans()
         {
@@ -59,21 +74,7 @@ namespace airtel.Controllers
             }
 
         }
-        [HttpGet("/Cart/{customerId}")]
-        public async Task<IActionResult> GetOrders(long customerId)
-        {
-            if (customerId != null)
-            {
-                var orders = _context.orders
-                                     .Where(x => x.customerId == customerId);
-
-                return Ok(orders.ToArray());
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
+        
 
         [HttpPost("/Addtocart")]
         public async Task<IActionResult> Addtocart([FromBody] AddtocartDTO addtocart)
@@ -141,20 +142,7 @@ namespace airtel.Controllers
                 return BadRequest();
             }
         }
-        [HttpGet("/Getcustname")]
-        public async Task<IActionResult> Getcustname([FromQuery] long customerId)
-        {
-            if (customerId != null)
-            {
-                IEnumerable<User> userc = _context.user
-                                                  .Where(x => x.customerId == customerId);
-                return Ok(userc.Select(x => x.customerName));
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
+        
         [HttpGet("/PlaceOrder")]
         public async Task<IActionResult> PlaceOrder([FromQuery] long customerId)
         {
@@ -175,6 +163,21 @@ namespace airtel.Controllers
                 return BadRequest();
             }
         }
+        //[HttpGet("/Cart/{customerId}")]
+        //public async Task<IActionResult> GetOrders(long customerId)
+        //{
+        //    if (customerId != null)
+        //    {
+        //        var orders = _context.orders
+        //                             .Where(x => x.customerId == customerId);
+
+        //        return Ok(orders.ToArray());
+        //    }
+        //    else
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
     }
 
 }
